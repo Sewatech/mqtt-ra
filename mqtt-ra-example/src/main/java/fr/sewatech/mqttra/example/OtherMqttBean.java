@@ -14,13 +14,12 @@ import javax.inject.Inject;
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "topicName", propertyValue = "swt/Question")
 })
-public class SecondMqttBean implements MqttMessageListener {
+public class OtherMqttBean implements MqttMessageListener {
 
     @Inject
     MqttConnectionFactory connectionFactory;
 
     public void onMessage(Message message) {
-        Messages.add(message);
         System.out.println("Message received in " + this.getClass().getName() + " on Topic " + message.getTopic());
     }
 }

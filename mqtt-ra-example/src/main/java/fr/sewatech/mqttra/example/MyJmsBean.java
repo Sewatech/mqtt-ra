@@ -20,7 +20,7 @@ import javax.jms.*;
 //                                  propertyValue="XAConnectionFactory")
 //})
 //@ResourceAdapter("generic-jms-ra-<VERSION>.rar")
-public class JmsBean implements MessageListener {
+public class MyJmsBean implements MessageListener {
 
     @Resource
     private MessageDrivenContext context;

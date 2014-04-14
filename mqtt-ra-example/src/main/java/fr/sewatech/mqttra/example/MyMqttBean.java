@@ -11,7 +11,7 @@ import javax.ejb.MessageDriven;
  * @author Alexis Hassler
  */
 @MessageDriven
-public class FirstMqttBean implements MqttMessageListener {
+public class MyMqttBean implements MqttMessageListener {
 
     public static final String RA_JNDI_NAME = "${mqttra.jndiname}";
 
@@ -20,7 +20,6 @@ public class FirstMqttBean implements MqttMessageListener {
 
     @Topic(name = "swt/Question", qos = QoS.AT_LEAST_ONCE)
     public void onQuestion(Message message) {
-        Messages.add(message);
         System.out.println("Message received " + new String(message.getPayload()) + " in " + this.getClass().getName() + " on Topic " + message.getTopic());
 
         answer("OK");
@@ -28,7 +27,6 @@ public class FirstMqttBean implements MqttMessageListener {
 
     @Topic(name = "swt/Question", qos = QoS.EXACTLY_ONCE)
     public void onQuestionToo(Message message) {
-        Messages.add(message);
         System.out.println("Message received " + new String(message.getPayload()) + " in " + this.getClass().getName() + " on Topic " + message.getTopic());
 
         answer("OK second time");
