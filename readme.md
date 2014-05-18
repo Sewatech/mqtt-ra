@@ -1,8 +1,6 @@
 # Getting Started with WildFly
 
-WildFly has no MQTT broker embedded. You'll have to install a start an independant one.
-
-For example you can use [Mosquitto](http://mosquitto.org) and start it with the
+WildFly has no MQTT broker embedded. You'll have to install a start an independent one. For example you can use [Mosquitto](http://mosquitto.org).
 
 Build the project and run WildFly
 

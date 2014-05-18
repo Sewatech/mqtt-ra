@@ -15,6 +15,10 @@
             <security>
                 <application/>
             </security>
+            <pool>
+                <min-pool-size>0</min-pool-size>
+                <max-pool-size>5</max-pool-size>
+            </pool>
         </connection-definition>
     </connection-definitions>
 </ironjacamar>

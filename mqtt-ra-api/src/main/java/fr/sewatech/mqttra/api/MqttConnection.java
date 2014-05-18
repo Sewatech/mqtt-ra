@@ -12,4 +12,6 @@ public interface MqttConnection {
     void publish(String topicName, String message);
 
     void publish(String message);
+
+    void close();
 }

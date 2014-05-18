@@ -3,16 +3,31 @@ package fr.sewatech.mqttra.connector.outbound;
 import org.fusesource.mqtt.client.QoS;
 
 import javax.resource.spi.ConnectionRequestInfo;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.util.Objects.equals;
 
 /**
  * @author Alexis Hassler
  */
 public class MqttConnectionRequestInfo implements ConnectionRequestInfo {
+
+    private static final Logger logger = Logger.getLogger(MqttConnectionRequestInfo.class.getName());
+
     private String serverUrl;
     private int qosLevel = -1;
     private String topicName;
     private String userName;
     private String password;
+
+    static MqttConnectionRequestInfoMerger merge() {
+        return new MqttConnectionRequestInfoMerger();
+    }
+    static MqttConnectionRequestInfoMerger merge(ConnectionRequestInfo connectionRequestInfo) {
+        return new MqttConnectionRequestInfoMerger((MqttConnectionRequestInfo) connectionRequestInfo);
+    }
 
     public String getServerUrl() {
         return serverUrl;
@@ -54,26 +69,78 @@ public class MqttConnectionRequestInfo implements ConnectionRequestInfo {
         this.password = password;
     }
 
-    public MqttConnectionRequestInfo mergeWith(MqttConnectionRequestInfo connectionRequestInfo) {
-        if (qosLevel < 0) {
-            qosLevel = connectionRequestInfo.qosLevel;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MqttConnectionRequestInfo that = (MqttConnectionRequestInfo) o;
+
+        if (logger.isLoggable(Level.INFO)) {
+            logger.info("Comparing : " + this + " and " + that);
         }
-        if (isNullOrEmpty(serverUrl)) {
-            serverUrl = connectionRequestInfo.serverUrl;
-        }
-        if (isNullOrEmpty(topicName)) {
-            topicName = connectionRequestInfo.topicName;
-        }
-        if (isNullOrEmpty(userName)) {
-            userName = connectionRequestInfo.userName;
-        }
-        if (isNullOrEmpty(password)) {
-            password = connectionRequestInfo.password;
-        }
-        return this;
+
+        return Objects.equals(qosLevel, that.qosLevel)
+                && Objects.equals(password, that.password)
+                && Objects.equals(serverUrl, that.serverUrl)
+                && Objects.equals(topicName, that.topicName)
+                && Objects.equals(userName, that.userName);
     }
 
-    private boolean isNullOrEmpty(String value) {
-        return value == null || value.isEmpty();
+    @Override
+    public int hashCode() {
+        return Objects.hash(serverUrl, qosLevel, topicName, userName, password);
     }
+
+    @Override
+    public String toString() {
+        return "MqttConnectionRequestInfo : " + serverUrl + "/" + topicName;
+    }
+
+    static class MqttConnectionRequestInfoMerger {
+        private MqttConnectionRequestInfo first;
+
+        public MqttConnectionRequestInfoMerger() {
+        }
+
+        public MqttConnectionRequestInfoMerger(MqttConnectionRequestInfo first) {
+            this.first = first;
+        }
+
+        MqttConnectionRequestInfoMerger aCopyOf(ConnectionRequestInfo original) {
+            MqttConnectionRequestInfo first = (MqttConnectionRequestInfo) original;
+            this.first = new MqttConnectionRequestInfo();
+            this.first.serverUrl = first.serverUrl;
+            this.first.topicName = first.topicName;
+            this.first.userName = first.userName;
+            this.first.password = first.password;
+            this.first.qosLevel = first.qosLevel;
+            return this;
+        }
+
+        MqttConnectionRequestInfo with(MqttConnectionRequestInfo connectionRequestInfo) {
+            if (first.qosLevel < 0) {
+                first.qosLevel = connectionRequestInfo.qosLevel;
+            }
+            if (isNullOrEmpty(first.serverUrl)) {
+                first.serverUrl = connectionRequestInfo.serverUrl;
+            }
+            if (isNullOrEmpty(first.topicName)) {
+                first.topicName = connectionRequestInfo.topicName;
+            }
+            if (isNullOrEmpty(first.userName)) {
+                first.userName = connectionRequestInfo.userName;
+            }
+            if (isNullOrEmpty(first.password)) {
+                first.password = connectionRequestInfo.password;
+            }
+            return first;
+        }
+
+        private boolean isNullOrEmpty(String value) {
+            return value == null || value.isEmpty();
+        }
+    }
+
+
 }

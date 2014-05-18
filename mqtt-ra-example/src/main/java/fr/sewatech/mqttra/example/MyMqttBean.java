@@ -25,7 +25,7 @@ public class MyMqttBean implements MqttMessageListener {
         answer("OK");
     }
 
-    @Topic(name = "swt/Question", qos = QoS.EXACTLY_ONCE)
+    @Topic(name = "swt/QuestionToo", qos = QoS.EXACTLY_ONCE)
     public void onQuestionToo(Message message) {
         System.out.println("Message received " + new String(message.getPayload()) + " in " + this.getClass().getName() + " on Topic " + message.getTopic());
 
@@ -37,6 +37,7 @@ public class MyMqttBean implements MqttMessageListener {
         try {
             MqttConnection connection = connectionFactory.getConnection();
             connection.publish(message);
+            connection.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

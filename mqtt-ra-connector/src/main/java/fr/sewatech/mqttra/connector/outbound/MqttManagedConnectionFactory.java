@@ -7,8 +7,11 @@ import javax.resource.spi.*;
 import javax.security.auth.Subject;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import static fr.sewatech.mqttra.connector.outbound.MqttConnectionRequestInfo.merge;
 
 @ConnectionDefinition(connectionFactory = MqttConnectionFactoryImpl.class, connectionFactoryImpl = MqttConnectionFactoryImpl.class,
                       connection = BlockingConnection.class, connectionImpl = BlockingConnection.class)
@@ -27,23 +30,30 @@ public class MqttManagedConnectionFactory implements ManagedConnectionFactory, R
 
     @Override
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
+        logger.fine("createConnectionFactory for " + cxManager);
         return new MqttConnectionFactoryImpl(this, cxManager);
     }
 
     @Override
     public Object createConnectionFactory() throws ResourceException {
-        return createConnectionFactory(new MqttConnectionManager());
+        throw new ResourceException("This resource adapter doesn't support non-managed environments");
     }
 
     @Override
     public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        logger.fine("Creating managed connection");
-        return new MqttManagedConnection(( (MqttConnectionRequestInfo) cxRequestInfo).mergeWith(defaultConnectionRequestInfo) );
+        logger.info("Creating managed connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
+        return new MqttManagedConnection( merge().aCopyOf(cxRequestInfo).with(defaultConnectionRequestInfo) );
     }
 
     @Override
     public ManagedConnection matchManagedConnections(Set connectionSet, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        logger.fine("Trying to match a managed connection");
+        logger.info("Trying to match a managed connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
+        Iterator<ManagedConnection> iterator = connectionSet.iterator();
+        if (iterator.hasNext()) {
+            logger.info("Matching managed connection found");
+            return iterator.next();
+        }
+
         return null;
     }
 
