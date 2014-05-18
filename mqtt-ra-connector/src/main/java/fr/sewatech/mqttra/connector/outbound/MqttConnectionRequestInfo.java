@@ -76,8 +76,8 @@ public class MqttConnectionRequestInfo implements ConnectionRequestInfo {
 
         MqttConnectionRequestInfo that = (MqttConnectionRequestInfo) o;
 
-        if (logger.isLoggable(Level.INFO)) {
-            logger.info("Comparing : " + this + " and " + that);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Comparing : " + this + " and " + that);
         }
 
         return Objects.equals(qosLevel, that.qosLevel)

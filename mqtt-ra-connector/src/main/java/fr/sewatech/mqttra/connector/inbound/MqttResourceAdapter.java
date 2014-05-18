@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.resource.spi.TransactionSupport.TransactionSupportLevel.NoTransaction;
@@ -81,7 +82,7 @@ public class MqttResourceAdapter implements ResourceAdapter {
                         });
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Unable to deactivate an endpoint", e);
         }
     }
 

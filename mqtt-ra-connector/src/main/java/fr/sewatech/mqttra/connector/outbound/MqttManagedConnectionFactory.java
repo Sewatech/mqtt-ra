@@ -8,10 +8,13 @@ import javax.security.auth.Subject;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static fr.sewatech.mqttra.connector.outbound.MqttConnectionRequestInfo.merge;
+import static java.util.Objects.hash;
 
 @ConnectionDefinition(connectionFactory = MqttConnectionFactoryImpl.class, connectionFactoryImpl = MqttConnectionFactoryImpl.class,
                       connection = BlockingConnection.class, connectionImpl = BlockingConnection.class)
@@ -41,16 +44,20 @@ public class MqttManagedConnectionFactory implements ManagedConnectionFactory, R
 
     @Override
     public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        logger.info("Creating managed connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Creating managed connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
+        }
         return new MqttManagedConnection( merge().aCopyOf(cxRequestInfo).with(defaultConnectionRequestInfo) );
     }
 
     @Override
     public ManagedConnection matchManagedConnections(Set connectionSet, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        logger.info("Trying to match a managed connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Trying to match a managed connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
+        }
         Iterator<ManagedConnection> iterator = connectionSet.iterator();
         if (iterator.hasNext()) {
-            logger.info("Matching managed connection found");
+            logger.fine("Matching managed connection found");
             return iterator.next();
         }
 
@@ -104,16 +111,12 @@ public class MqttManagedConnectionFactory implements ManagedConnectionFactory, R
 
         MqttManagedConnectionFactory that = (MqttManagedConnectionFactory) o;
 
-        if (!defaultConnectionRequestInfo.equals(that.defaultConnectionRequestInfo)) return false;
-        if (!ra.equals(that.ra)) return false;
-
-        return true;
+        return Objects.equals(defaultConnectionRequestInfo, that.defaultConnectionRequestInfo)
+                && Objects.equals(ra, that.ra);
     }
 
     @Override
     public int hashCode() {
-        int result = ra.hashCode();
-        result = 31 * result + defaultConnectionRequestInfo.hashCode();
-        return result;
+        return hash(ra, defaultConnectionRequestInfo);
     }
 }

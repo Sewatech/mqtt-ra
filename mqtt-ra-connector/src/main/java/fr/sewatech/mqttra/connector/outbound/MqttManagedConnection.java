@@ -36,7 +36,7 @@ public class MqttManagedConnection implements javax.resource.spi.ManagedConnecti
 
     @Override
     public MqttConnection getConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        logger.info("Getting connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
+        logger.fine("Getting connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
 
         try {
             mqttConnection = new MqttConnectionImpl(this, currentConnectionRequestInfo);

@@ -6,6 +6,8 @@ import org.fusesource.mqtt.client.QoS;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Alexis Hassler
@@ -13,7 +15,8 @@ import javax.ejb.MessageDriven;
 @MessageDriven
 public class MyMqttBean implements MqttMessageListener {
 
-    public static final String RA_JNDI_NAME = "${mqttra.jndiname}";
+    private static final Logger logger = Logger.getLogger(MyMqttBean.class.getName());
+    private static final String RA_JNDI_NAME = "${mqttra.jndiname}";
 
     @Resource(name= RA_JNDI_NAME)
     MqttConnectionFactory connectionFactory;
@@ -34,12 +37,15 @@ public class MyMqttBean implements MqttMessageListener {
 
 
     private void answer(String message) {
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine(this.getClass().getName() + " will answer " + message);
+        }
         try {
             MqttConnection connection = connectionFactory.getConnection();
             connection.publish(message);
             connection.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 }
