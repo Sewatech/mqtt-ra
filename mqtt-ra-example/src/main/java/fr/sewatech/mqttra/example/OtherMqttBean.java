@@ -9,10 +9,14 @@ import javax.ejb.MessageDriven;
 import javax.inject.Inject;
 
 /**
+ * Won't receive any message : no @Topic method
+ *
  * @author Alexis Hassler
  */
 @MessageDriven(activationConfig = {
-        @ActivationConfigProperty(propertyName = "topicName", propertyValue = "swt/Question")
+        @ActivationConfigProperty(propertyName = "topicName", propertyValue = "swt/Question"),
+        @ActivationConfigProperty(propertyName = "qosLevel", propertyValue = "1")
+
 })
 public class OtherMqttBean implements MqttMessageListener {
 

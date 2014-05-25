@@ -86,11 +86,7 @@ public class ActivationSpecBean implements ActivationSpec {
 
     @Override
     public void validate() throws InvalidPropertyException {
-//        validateNotNullOrEmpty("topicName", topicName);
         validateNotNullOrEmpty("serverUrl", serverUrl);
-//        if (qosLevel < 0 || qosLevel > 2) {
-//            throw new InvalidPropertyException("qosLevel value " + qosLevel + "is not valid, it should be between 0 and 2");
-//        }
     }
 
     private void validateNotNullOrEmpty(String propertyName, String value) throws InvalidPropertyException {
@@ -123,5 +119,15 @@ public class ActivationSpecBean implements ActivationSpec {
     @Override
     public int hashCode() {
         return Objects.hash(topicName, qosLevel, serverUrl);
+    }
+
+
+    @Override
+    public String toString() {
+        return "ActivationSpecBean{" +
+                "topicName=" + topicName +
+                ", qosLevel=" + qosLevel +
+                ", serverUrl='" + serverUrl +
+                '}';
     }
 }

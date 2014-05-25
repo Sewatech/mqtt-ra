@@ -4,7 +4,6 @@ import fr.sewatech.mqttra.api.*;
 import org.fusesource.mqtt.client.QoS;
 
 import javax.annotation.Resource;
-import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +15,7 @@ import java.util.logging.Logger;
 public class MyMqttBean implements MqttMessageListener {
 
     private static final Logger logger = Logger.getLogger(MyMqttBean.class.getName());
-    private static final String RA_JNDI_NAME = "${mqttra.jndiname}";
+    private static final String RA_JNDI_NAME = "java:/mqtt/AnswerCF";
 
     @Resource(name= RA_JNDI_NAME)
     MqttConnectionFactory connectionFactory;

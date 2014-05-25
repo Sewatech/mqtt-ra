@@ -121,9 +121,9 @@
                     <version>8.1.0.CR2</version>
                     <execute-commands>
                         <commands>
-                            <command>/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=ALL)</command>
+                            <command>/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=FINE)</command>
                             <command>/subsystem=logging/logger=fr.sewatech.mqttra.connector.outbound:add(level=INFO)</command>
-                            <command>/subsystem=logging/logger=fr.sewatech.mqttra.connector.inbound:add(level=INFO)</command>
+                            <command>/subsystem=logging/logger=fr.sewatech.mqttra.connector.inbound:add(level=FINE)</command>
                             <command>/subsystem=logging/logger=fr.sewatech.mqttra.example:add(level=INFO)</command>
                         </commands>
                     </execute-commands>

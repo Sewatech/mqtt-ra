@@ -44,9 +44,11 @@ public class MqttResourceAdapter implements ResourceAdapter {
     }
 
     @Override
-    public void endpointActivation(MessageEndpointFactory mdbFactory, ActivationSpec activationSpec) throws ResourceException {
+    public void endpointActivation(MessageEndpointFactory mdbFactory, ActivationSpec activationSpec)
+            throws ResourceException {
         logger.fine("endpoint activation");
-        final ActivationSpecBean spec = ActivationSpecBean.class.cast(activationSpec);
+        ActivationSpecBean spec = ActivationSpecBean.class.cast(activationSpec);
+        System.out.println("endpointActivation on topic " + spec.getTopicName());
 
         try {
             BlockingQueue<MqttMessageListener> pool = initializeEndpointsPool(mdbFactory, spec);
@@ -56,7 +58,7 @@ public class MqttResourceAdapter implements ResourceAdapter {
             for (Method method : endpointClass.getMethods()) {
                 if (method.isAnnotationPresent(Topic.class)) {
                     createConnection(mdbFactory, method, spec)
-                        .listener(new MqttClientListener(endPointProxy, method));
+                            .listener(new MqttClientListener(endPointProxy, method));
                 }
             }
 
@@ -67,19 +69,29 @@ public class MqttResourceAdapter implements ResourceAdapter {
 
     @Override
     public void endpointDeactivation(MessageEndpointFactory mdbFactory, ActivationSpec activationSpec) {
-        logger.fine("endpoint deactivation");
-        Key key = new Key(mdbFactory, activationSpec);
+        logger.fine("Endpoint deactivation");
+
         try {
-            final CallbackConnection connection = connections.remove(key);
-            if (connection != null) {
-                connection.suspend();  // in order to skip other messages in the topic
-                connection.getDispatchQueue()
-                        .execute(new Task() {
-                            @Override
-                            public void run() {
-                                connection.kill(new LoggingCallback<Void>("disconnect"));
-                            }
-                        });
+            Class<?> endpointClass = mdbFactory.getEndpointClass();
+            for (Method method : endpointClass.getMethods()) {
+                if (method.isAnnotationPresent(Topic.class)) {
+                    Key key = new Key(mdbFactory, activationSpec, method);
+
+                    final CallbackConnection connection = connections.remove(key);
+                    if (connection == null) {
+                        logger.fine("Cannot find connection for key " + key);
+                    } else {
+                        logger.fine("Connection found for key " + key);
+                        connection.suspend();  // in order to skip other messages in the topic
+                        connection.getDispatchQueue()
+                                .execute(new Task() {
+                                    @Override
+                                    public void run() {
+                                        connection.kill(new LoggingCallback<Void>("disconnect"));
+                                    }
+                                });
+                    }
+                }
             }
         } catch (Throwable e) {
             logger.log(Level.WARNING, "Unable to deactivate an endpoint", e);
@@ -87,7 +99,8 @@ public class MqttResourceAdapter implements ResourceAdapter {
     }
 
 
-    private BlockingQueue<MqttMessageListener> initializeEndpointsPool(MessageEndpointFactory mdbFactory, ActivationSpecBean spec) throws UnavailableException {
+    private BlockingQueue<MqttMessageListener> initializeEndpointsPool(MessageEndpointFactory mdbFactory, ActivationSpecBean spec)
+            throws UnavailableException {
         int poolSize = spec.getPoolSize();
         logger.fine("Initializing pool with " + poolSize + " connections");
         BlockingQueue<MqttMessageListener> pool = new ArrayBlockingQueue<>(poolSize);
@@ -101,7 +114,8 @@ public class MqttResourceAdapter implements ResourceAdapter {
         return new MqttMessageListenerProxy(bootstrapContext, pool);
     }
 
-    private CallbackConnection createConnection(final MessageEndpointFactory mdbFactory, final Method method, final ActivationSpecBean spec) throws URISyntaxException {
+    private CallbackConnection createConnection(final MessageEndpointFactory mdbFactory, final Method method, final ActivationSpecBean spec)
+            throws URISyntaxException {
         logger.fine("Creating connection to " + spec.getUserName() + " with login " + spec.getUserName());
         MQTT mqtt = new MQTT();
         mqtt.setUserName(spec.getUserName());
@@ -119,8 +133,9 @@ public class MqttResourceAdapter implements ResourceAdapter {
                         new org.fusesource.mqtt.client.Topic[]{new org.fusesource.mqtt.client.Topic(annotation.name(), annotation.qos())},
                         new LoggingCallback<byte[]>("subscribe"));
 
-                Key key = new Key(mdbFactory, spec);
+                Key key = new Key(mdbFactory, spec, method);
                 connections.put(key, connection);
+                logger.fine("Connection registered under key " + key);
             }
         });
 
@@ -136,10 +151,12 @@ public class MqttResourceAdapter implements ResourceAdapter {
     class Key {
         private MessageEndpointFactory factory;
         private ActivationSpec activationSpec;
+        private Method method;
 
-        Key(MessageEndpointFactory factory, ActivationSpec activationSpec) {
+        Key(MessageEndpointFactory factory, ActivationSpec activationSpec, Method method) {
             this.factory = factory;
             this.activationSpec = activationSpec;
+            this.method = method;
         }
 
         @Override
@@ -150,12 +167,18 @@ public class MqttResourceAdapter implements ResourceAdapter {
             Key that = (Key) o;
 
             return Objects.equals(this.factory, that.factory)
-                    && Objects.equals(this.activationSpec, that.activationSpec);
+                    && Objects.equals(this.activationSpec, that.activationSpec)
+                    && Objects.equals(this.method, that.method);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.factory, this.activationSpec);
+            return Objects.hash(this.factory, this.activationSpec, this.method);
+        }
+
+        @Override
+        public String toString() {
+            return factory.getClass().getSimpleName() + " / " + activationSpec;
         }
     }
 
@@ -166,14 +189,11 @@ public class MqttResourceAdapter implements ResourceAdapter {
 
         MqttResourceAdapter that = (MqttResourceAdapter) o;
 
-        if (!bootstrapContext.equals(that.bootstrapContext)) return false;
-
-        return true;
+        return Objects.equals(this.bootstrapContext, that.bootstrapContext);
     }
 
     @Override
     public int hashCode() {
-        int result = connections.hashCode();
-        return result;
+        return Objects.hash(bootstrapContext);
     }
 }

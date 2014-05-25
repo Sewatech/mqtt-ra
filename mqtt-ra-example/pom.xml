@@ -33,21 +33,6 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
-
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.java</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.properties</include>
-                </includes>
-                <filtering>true</filtering>
-                <targetPath>${project.build.directory}/generated-sources/filtered</targetPath>
-            </resource>
-        </resources>
-        <sourceDirectory>${project.build.directory}/generated-sources/filtered</sourceDirectory>
-
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
