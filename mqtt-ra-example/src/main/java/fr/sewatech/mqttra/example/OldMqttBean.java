@@ -21,7 +21,7 @@ import javax.inject.Inject;
         @ActivationConfigProperty(propertyName = "qosLevel", propertyValue = "1")
 
 })
-public class OtherMqttBean implements MessageListener {
+public class OldMqttBean implements MessageListener {
 
     @Inject
     MqttConnectionFactory connectionFactory;
