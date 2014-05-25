@@ -1,6 +1,6 @@
 package fr.sewatech.mqttra.connector.inbound;
 
-import fr.sewatech.mqttra.api.MqttMessageListener;
+import fr.sewatech.mqttra.api.MqttListener;
 import org.fusesource.mqtt.client.QoS;
 import org.fusesource.mqtt.client.Topic;
 
@@ -14,7 +14,7 @@ import java.util.Objects;
 /**
  * @author Alexis Hassler
  */
-@Activation(messageListeners = MqttMessageListener.class)
+@Activation(messageListeners = MqttListener.class)
 public class ActivationSpecBean implements ActivationSpec {
     private ResourceAdapter resourceAdapter;
 

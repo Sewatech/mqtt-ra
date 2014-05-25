@@ -11,10 +11,10 @@ import java.lang.reflect.Method;
 * @author Alexis Hassler
 */
 class MqttClientListener implements Listener {
-    private final MqttMessageListenerProxy mdb;
+    private final MqttListenerProxy mdb;
     private Method method;
 
-    public MqttClientListener(MqttMessageListenerProxy mdb, Method method) {
+    public MqttClientListener(MqttListenerProxy mdb, Method method) {
         this.mdb = mdb;
         this.method = method;
     }

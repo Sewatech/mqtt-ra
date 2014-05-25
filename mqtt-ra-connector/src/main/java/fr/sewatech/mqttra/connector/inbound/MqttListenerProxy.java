@@ -1,7 +1,7 @@
 package fr.sewatech.mqttra.connector.inbound;
 
 import fr.sewatech.mqttra.api.Message;
-import fr.sewatech.mqttra.api.MqttMessageListener;
+import fr.sewatech.mqttra.api.MqttListener;
 
 import javax.resource.spi.BootstrapContext;
 import javax.resource.spi.work.Work;
@@ -12,18 +12,18 @@ import java.util.concurrent.BlockingQueue;
 /**
  * @author Alexis Hassler
  */
-public class MqttMessageListenerProxy implements MqttMessageListener{
+public class MqttListenerProxy implements MqttListener {
 
-    private BlockingQueue<MqttMessageListener> pool;
+    private BlockingQueue<MqttListener> pool;
     private BootstrapContext bootstrapContext;
 
-    public MqttMessageListenerProxy(BootstrapContext bootstrapContext, BlockingQueue<MqttMessageListener> pool) {
+    public MqttListenerProxy(BootstrapContext bootstrapContext, BlockingQueue<MqttListener> pool) {
         this.bootstrapContext = bootstrapContext;
         this.pool = pool;
     }
 
     public void onMessage(final Message message, final Method method) {
-        final MqttMessageListener listener;
+        final MqttListener listener;
         try {
             listener = pool.take();
 

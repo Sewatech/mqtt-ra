@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * @author Alexis Hassler
  */
 @MessageDriven
-public class MyMqttBean implements MqttMessageListener {
+public class MyMqttBean implements MqttListener {
 
     private static final Logger logger = Logger.getLogger(MyMqttBean.class.getName());
     private static final String RA_JNDI_NAME = "java:/mqtt/AnswerCF";

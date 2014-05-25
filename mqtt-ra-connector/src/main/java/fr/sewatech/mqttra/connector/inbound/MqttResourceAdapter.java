@@ -1,10 +1,13 @@
 package fr.sewatech.mqttra.connector.inbound;
 
-import fr.sewatech.mqttra.api.MqttMessageListener;
+import fr.sewatech.mqttra.api.Message;
+import fr.sewatech.mqttra.api.MessageListener;
+import fr.sewatech.mqttra.api.MqttListener;
 import fr.sewatech.mqttra.api.Topic;
 import org.fusesource.hawtdispatch.Task;
 import org.fusesource.mqtt.client.CallbackConnection;
 import org.fusesource.mqtt.client.MQTT;
+import org.fusesource.mqtt.client.QoS;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.*;
@@ -48,13 +51,19 @@ public class MqttResourceAdapter implements ResourceAdapter {
             throws ResourceException {
         logger.fine("endpoint activation");
         ActivationSpecBean spec = ActivationSpecBean.class.cast(activationSpec);
-        System.out.println("endpointActivation on topic " + spec.getTopicName());
 
         try {
-            BlockingQueue<MqttMessageListener> pool = initializeEndpointsPool(mdbFactory, spec);
-            MqttMessageListenerProxy endPointProxy = createEndPointProxy(pool);
+            BlockingQueue<MqttListener> pool = initializeEndpointsPool(mdbFactory, spec);
+            MqttListenerProxy endPointProxy = createEndPointProxy(pool);
 
             Class<?> endpointClass = mdbFactory.getEndpointClass();
+
+            if (isOldFashion(endpointClass)) {
+                Method method = endpointClass.getDeclaredMethod("onMessage", Message.class);
+                createConnection(mdbFactory, method, spec)
+                        .listener(new MqttClientListener(endPointProxy, method));
+            }
+
             for (Method method : endpointClass.getMethods()) {
                 if (method.isAnnotationPresent(Topic.class)) {
                     createConnection(mdbFactory, method, spec)
@@ -73,24 +82,15 @@ public class MqttResourceAdapter implements ResourceAdapter {
 
         try {
             Class<?> endpointClass = mdbFactory.getEndpointClass();
+
+            if (isOldFashion(endpointClass)) {
+                Method method = endpointClass.getDeclaredMethod("onMessage", Message.class);
+                unregisterConnection(new Key(mdbFactory, activationSpec, method));
+            }
+
             for (Method method : endpointClass.getMethods()) {
                 if (method.isAnnotationPresent(Topic.class)) {
-                    Key key = new Key(mdbFactory, activationSpec, method);
-
-                    final CallbackConnection connection = connections.remove(key);
-                    if (connection == null) {
-                        logger.fine("Cannot find connection for key " + key);
-                    } else {
-                        logger.fine("Connection found for key " + key);
-                        connection.suspend();  // in order to skip other messages in the topic
-                        connection.getDispatchQueue()
-                                .execute(new Task() {
-                                    @Override
-                                    public void run() {
-                                        connection.kill(new LoggingCallback<Void>("disconnect"));
-                                    }
-                                });
-                    }
+                    unregisterConnection(new Key(mdbFactory, activationSpec, method));
                 }
             }
         } catch (Throwable e) {
@@ -98,20 +98,41 @@ public class MqttResourceAdapter implements ResourceAdapter {
         }
     }
 
+    private boolean isOldFashion(Class<?> endpointClass) {
+        return MessageListener.class.isAssignableFrom(endpointClass);
+    }
 
-    private BlockingQueue<MqttMessageListener> initializeEndpointsPool(MessageEndpointFactory mdbFactory, ActivationSpecBean spec)
+    private void unregisterConnection(Key key) {
+        final CallbackConnection connection = connections.remove(key);
+        if (connection == null) {
+            logger.fine("Cannot find connection for key " + key);
+        } else {
+            logger.fine("Connection found for key " + key);
+            connection.suspend();  // in order to skip other messages in the topic
+            connection.getDispatchQueue()
+                    .execute(new Task() {
+                        @Override
+                        public void run() {
+                            connection.kill(new LoggingCallback<Void>("disconnect"));
+                        }
+                    });
+        }
+    }
+
+
+    private BlockingQueue<MqttListener> initializeEndpointsPool(MessageEndpointFactory mdbFactory, ActivationSpecBean spec)
             throws UnavailableException {
         int poolSize = spec.getPoolSize();
         logger.fine("Initializing pool with " + poolSize + " connections");
-        BlockingQueue<MqttMessageListener> pool = new ArrayBlockingQueue<>(poolSize);
+        BlockingQueue<MqttListener> pool = new ArrayBlockingQueue<>(poolSize);
         for (int i = 0; i < poolSize; i++) {
-            pool.add(MqttMessageListener.class.cast(mdbFactory.createEndpoint(null)));
+            pool.add(MqttListener.class.cast(mdbFactory.createEndpoint(null)));
         }
         return pool;
     }
 
-    private MqttMessageListenerProxy createEndPointProxy(final BlockingQueue<MqttMessageListener> pool) {
-        return new MqttMessageListenerProxy(bootstrapContext, pool);
+    private MqttListenerProxy createEndPointProxy(final BlockingQueue<MqttListener> pool) {
+        return new MqttListenerProxy(bootstrapContext, pool);
     }
 
     private CallbackConnection createConnection(final MessageEndpointFactory mdbFactory, final Method method, final ActivationSpecBean spec)
@@ -129,9 +150,18 @@ public class MqttResourceAdapter implements ResourceAdapter {
                 super.onSuccess(value);
 
                 Topic annotation = method.getAnnotation(Topic.class);
+                    String name;
+                    QoS qos;
+                if (annotation == null) {
+                    name = spec.getTopicName();
+                    qos = spec.getQos();
+                } else {
+                    name = annotation.name() == null ? spec.getTopicName() : annotation.name();
+                    qos = annotation.qos() == null ? spec.getQos() : annotation.qos();
+                }
                 connection.subscribe(
-                        new org.fusesource.mqtt.client.Topic[]{new org.fusesource.mqtt.client.Topic(annotation.name(), annotation.qos())},
-                        new LoggingCallback<byte[]>("subscribe"));
+                            new org.fusesource.mqtt.client.Topic[]{new org.fusesource.mqtt.client.Topic(name, qos)},
+                            new LoggingCallback<byte[]>("subscribe"));
 
                 Key key = new Key(mdbFactory, spec, method);
                 connections.put(key, connection);

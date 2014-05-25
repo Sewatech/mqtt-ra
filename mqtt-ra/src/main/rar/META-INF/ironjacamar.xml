@@ -2,7 +2,7 @@
 <ironjacamar id="mqtt-ra.rar">
     <connection-definitions>
         <connection-definition class-name="fr.sewatech.mqttra.connector.outbound.MqttManagedConnectionFactory"
-                               jndi-name="java:/mqtt/AnswerCF" pool-name="AnswerCFx">
+                               jndi-name="java:/mqtt/AnswerCF" pool-name="AnswerCF-Pool">
             <config-property name="defaultQosLevel">
                 1
             </config-property>
@@ -10,7 +10,7 @@
                 tcp://localhost:1883
             </config-property>
             <config-property name="defaultTopic">
-                swt/Answer
+                swt/Default
             </config-property>
             <security>
                 <application/>
