@@ -37,9 +37,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:hasalex/mqtt-ra.git</connection>
-        <url>scm:git:git@github.com:hasalex/mqtt-ra.git</url>
-        <developerConnection>scm:git:git@github.com:hasalex/mqtt-ra.git</developerConnection>
+        <connection>scm:git:git@github.com:Sewatech/mqtt-ra.git</connection>
+        <url>scm:git:git@github.com:Sewatech/mqtt-ra.git</url>
+        <developerConnection>scm:git:git@github.com:Sewatech/mqtt-ra.git</developerConnection>
     </scm>
 
     <developers>
