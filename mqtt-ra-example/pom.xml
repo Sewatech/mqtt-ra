@@ -22,7 +22,7 @@
     <parent>
         <groupId>fr.sewatech.mqttra</groupId>
         <artifactId>mqtt-ra-parent</artifactId>
-        <version>1.0.0-alpha</version>
+        <version>1.0.0-beta-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
