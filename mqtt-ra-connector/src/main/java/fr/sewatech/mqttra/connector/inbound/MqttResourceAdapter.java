@@ -41,10 +41,12 @@ import java.util.logging.Logger;
 import static javax.resource.spi.TransactionSupport.TransactionSupportLevel.NoTransaction;
 
 /**
+ * Main class of the inbound connector
+ *
  * @author Alexis Hassler
  */
 @Connector(
-        vendorName = "sewatech", version = "0.1", eisType = "MQTT Broker",
+        vendorName = "sewatech", version = "1.0", eisType = "MQTT Broker",
         transactionSupport = NoTransaction)
 public class MqttResourceAdapter implements ResourceAdapter {
     private static final Logger logger = Logger.getLogger(MqttResourceAdapter.class.getName());

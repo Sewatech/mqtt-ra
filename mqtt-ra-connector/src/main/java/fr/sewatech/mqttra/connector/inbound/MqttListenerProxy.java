@@ -25,6 +25,8 @@ import java.lang.reflect.Method;
 import java.util.concurrent.BlockingQueue;
 
 /**
+ * Proxy between the resource adapter and the MqttListener. Manage a pool of listeners and distribute the received messages across them.
+ *
  * @author Alexis Hassler
  */
 public class MqttListenerProxy implements MqttListener {

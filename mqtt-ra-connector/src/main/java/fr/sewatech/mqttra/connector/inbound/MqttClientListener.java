@@ -23,8 +23,10 @@ import org.fusesource.mqtt.client.Listener;
 import java.lang.reflect.Method;
 
 /**
-* @author Alexis Hassler
-*/
+ * Listener on the MQTT client. Each instance is bound to a MDB instance, and resend each message received to the MDB.
+ *
+ * @author Alexis Hassler
+ */
 class MqttClientListener implements Listener {
     private final MqttListenerProxy mdb;
     private Method method;
