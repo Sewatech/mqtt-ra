@@ -21,10 +21,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * Interface to mark MQTT listener methods
+ *
  * @author Alexis Hassler
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Topic {
+    /**
+     *  Name of the topic
+     */
     public String name();
+    /**
+     *  Quality of Service level of the connection with the topic
+     */
     public QoS qos();
 }

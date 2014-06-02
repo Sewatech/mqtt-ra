@@ -16,6 +16,11 @@
 package fr.sewatech.mqttra.api;
 
 /**
+ * Interface for the modern way MDBs. Implement it to receive asynchronously receive MQTT messages.
+ *
+ * There's no method to implement, it's just a marker interface. Instead of that, implement serveral methods marked
+ * with the @Topic annotation.
+ *
  * @author Alexis Hassler
  */
 public interface MqttListener {

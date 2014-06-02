@@ -16,6 +16,8 @@
 package fr.sewatech.mqttra.api;
 
 /**
+ * MQTT message, with a binary content and a topic reference
+ *
  * @author Alexis Hassler
  */
 public class Message {

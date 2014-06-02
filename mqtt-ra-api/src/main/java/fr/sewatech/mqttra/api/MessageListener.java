@@ -16,10 +16,17 @@
 package fr.sewatech.mqttra.api;
 
 /**
- * Interface for the old fashion MDBs
+ * Interface for the old fashion MDBs. Implement it to receive asynchronously receive MQTT messages.
  *
  * @author Alexis Hassler
  */
 public interface MessageListener extends MqttListener {
+
+    /**
+     *
+     * Receives the messages from the MQTT broker
+     *
+     * @param message the message passed to the listener
+     */
     public void onMessage(Message message);
 }

@@ -18,14 +18,34 @@ package fr.sewatech.mqttra.api;
 import org.fusesource.mqtt.client.QoS;
 
 /**
+ * MQTT outbound connection
+ *
  * @author Alexis Hassler
  */
 public interface MqttConnection {
 
+    /**
+     * Publish a text message in a specific topic, with a specific qos level
+     *
+     * @param topicName Topic
+     * @param message Text message
+     * @param qos Qality of service level
+     */
     void publish(String topicName, String message, QoS qos);
 
+    /**
+     * Publish a text message in a specific topic, with the default qos level
+     *
+     * @param topicName Topic
+     * @param message Text message
+     */
     void publish(String topicName, String message);
 
+    /**
+     * Publish a text message in the default topic, with the default qos level
+     *
+     * @param message Text message
+     */
     void publish(String message);
 
     void close();

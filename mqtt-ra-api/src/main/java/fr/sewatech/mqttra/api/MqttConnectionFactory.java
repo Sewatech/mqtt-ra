@@ -16,10 +16,22 @@
 package fr.sewatech.mqttra.api;
 
 /**
+ *
+ * MQTT outbound connection factory
+ *
  * @author Alexis Hassler
  */
 public interface MqttConnectionFactory {
+    /**
+     * Get a connection to the MQTT broker with the default credentials
+     */
     MqttConnection getConnection();
 
+    /**
+     * Get a connectionto the MQTT broker  with specific credentials
+     *
+     * @param userName the MQTT user on whose behalf the connection is being made
+     * @param password the user's password
+     */
     MqttConnection getConnection(String userName, String password);
 }
