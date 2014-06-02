@@ -26,6 +26,12 @@
     <packaging>pom</packaging>
     <version>1.0.0-alpha</version>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <name>MQTT JCA resource adapter</name>
     <description>A JCA 1.7 resource adapter for MQTT brokers</description>
     <url>https://github.com/hasalex/mqtt-ra</url>
