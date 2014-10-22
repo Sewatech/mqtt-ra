@@ -26,10 +26,10 @@ import javax.ejb.Stateless;
  * @author Alexis Hassler
  */
 @Stateless @LocalBean
-public class MyStatelessBean {
+public class SimpleStatelessBean {
     private static final String QUESTION_TOPIC_NAME = "swt/Question";
 
-    @Resource(name="MqttDashboardCF")
+    @Resource(name = "MqttDashboardCF")
     MqttConnectionFactory connectionFactory;
 
     public void ask(String message) {

@@ -22,7 +22,7 @@ import javax.enterprise.inject.Produces;
 
 public class MqttResourceProducer {
 
-    @Produces @Resource(name="mqtt/AnswerCF")
-    private MqttConnectionFactory answerConnectionFactory;
+  @Produces @Resource(name = "mqtt/AnswerCF")
+  private MqttConnectionFactory answerConnectionFactory;
 
 }

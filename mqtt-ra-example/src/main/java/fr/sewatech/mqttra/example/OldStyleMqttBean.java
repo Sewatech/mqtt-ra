@@ -16,39 +16,39 @@
 package fr.sewatech.mqttra.example;
 
 import fr.sewatech.mqttra.api.*;
-import org.fusesource.mqtt.client.QoS;
 
 import javax.annotation.Resource;
+import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Old style MDB
+ *
  * @author Alexis Hassler
  */
-@MessageDriven
-public class MyMqttBean implements MqttListener {
+@MessageDriven(
+    messageListenerInterface = MqttListener.class,
+    activationConfig = {
+            @ActivationConfigProperty(propertyName = "topicName", propertyValue = "swt/Question"),
+            @ActivationConfigProperty(propertyName = "qosLevel", propertyValue = "1")
 
-    private static final Logger logger = Logger.getLogger(MyMqttBean.class.getName());
+    })
+public class OldStyleMqttBean implements MessageListener {
+
+    private static final Logger logger = Logger.getLogger(OldStyleMqttBean.class.getName());
     private static final String RA_JNDI_NAME = "java:/mqtt/AnswerCF";
 
-    @Resource(name= RA_JNDI_NAME)
+    @Resource(name = RA_JNDI_NAME)
     MqttConnectionFactory connectionFactory;
 
-    @Topic(name = "swt/Question", qos = QoS.AT_LEAST_ONCE)
-    public void onQuestion(Message message) {
-        System.out.println("Message received " + new String(message.getPayload()) + " in " + this.getClass().getName() + " on Topic " + message.getTopic());
+    @Override
+    public void onMessage(Message message) {
+        System.out.println("Message received " + message.asText() + " in " + this.getClass().getName() + " on Topic " + message.getTopic());
 
-        answer("OK");
+        answer("Ah que " + message.asText());
     }
-
-    @Topic(name = "swt/QuestionToo", qos = QoS.EXACTLY_ONCE)
-    public void onQuestionToo(Message message) {
-        System.out.println("Message received " + new String(message.getPayload()) + " in " + this.getClass().getName() + " on Topic " + message.getTopic());
-
-        answer("OK second time");
-    }
-
 
     private void answer(String message) {
         if (logger.isLoggable(Level.FINE)) {

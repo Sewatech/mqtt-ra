@@ -31,8 +31,10 @@ import java.util.logging.Logger;
 import static fr.sewatech.mqttra.connector.outbound.MqttConnectionRequestInfo.merge;
 import static java.util.Objects.hash;
 
-@ConnectionDefinition(connectionFactory = MqttConnectionFactoryImpl.class, connectionFactoryImpl = MqttConnectionFactoryImpl.class,
-                      connection = BlockingConnection.class, connectionImpl = BlockingConnection.class)
+@ConnectionDefinition(connectionFactory = MqttConnectionFactoryImpl.class,
+        connectionFactoryImpl = MqttConnectionFactoryImpl.class,
+        connection = BlockingConnection.class,
+        connectionImpl = BlockingConnection.class)
 public class MqttManagedConnectionFactory implements ManagedConnectionFactory, ResourceAdapterAssociation, Serializable {
 
     private static final Logger logger = Logger.getLogger(MqttManagedConnectionFactory.class.getName());
@@ -62,7 +64,7 @@ public class MqttManagedConnectionFactory implements ManagedConnectionFactory, R
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Creating managed connection for cxRequestInfo " + System.identityHashCode(cxRequestInfo));
         }
-        return new MqttManagedConnection( merge().aCopyOf(cxRequestInfo).with(defaultConnectionRequestInfo) );
+        return new MqttManagedConnection(merge().aCopyOf(cxRequestInfo).with(defaultConnectionRequestInfo));
     }
 
     @Override

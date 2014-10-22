@@ -22,19 +22,23 @@ package fr.sewatech.mqttra.api;
  */
 public class Message {
 
-    private String topic;
-    private byte[] payload;
+  private String topic;
+  private byte[] payload;
 
-    public Message(String topic, byte[] payload) {
-        this.payload = payload;
-        this.topic = topic;
-    }
+  public Message(String topic, byte[] payload) {
+    this.payload = payload;
+    this.topic = topic;
+  }
 
-    public byte[] getPayload() {
-        return payload;
-    }
+  public byte[] getPayload() {
+    return payload;
+  }
 
-    public String getTopic() {
-        return topic;
-    }
+  public String asText() {
+    return new String(payload);
+  }
+
+  public String getTopic() {
+    return topic;
+  }
 }

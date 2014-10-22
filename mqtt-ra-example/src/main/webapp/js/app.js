@@ -282,7 +282,7 @@ var websocketclient = {
         'subscription': function (subscription) {
             var largest = websocketclient.lastSubId++;
             $("#innerEdit").append(
-                '<li class="subLine" id="sub' + largest + '">' +
+                    '<li class="subLine" id="sub' + largest + '">' +
                     '   <div class="row large-12 subs' + largest + '" style="border-left: solid 10px #' + subscription.color + '; background-color: #ffffff">' +
                     '       <div class="large-12 columns subText">' +
                     '           <div class="large-1 columns right closer">' +
