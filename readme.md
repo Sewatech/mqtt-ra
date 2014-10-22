@@ -34,7 +34,7 @@ It comes with the command line mosquitto_pub and mosquitto_sub clients.
 
 What, you don't wanna install this great command line tool ? You're probably not a backend guy/girl. OK, I'll give you some HTML/JS. Hopefully you
 have a modern browser, then it should work because Tomee+ supports MQTT + WebSockets. The magic page is at the [root of the example application]
-(http://localhost:8080/mqtt-ra-example-1.0-SNAPSHOT/).
+(http://localhost:8080/mqtt-ra-example/).
 
 How does it work ?
 
